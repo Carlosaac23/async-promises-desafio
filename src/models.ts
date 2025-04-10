@@ -1,35 +1,42 @@
-import * as jsonfile from "jsonfile";
+import * as jsonfile from 'jsonfile';
 
 class Contact {
   id?: number = undefined;
-  name: string = "";
+  name: string = '';
 }
 
 class ContactsCollection {
   data: Contact[] = [];
+
   load() {
     // usar la version Async (readFile)
-    const json = jsonfile.readFileSync(__dirname + "/contacts.json");
-    this.data = json;
+    const jsonPromise = jsonfile.readFile(__dirname + '/contacts.json');
+    jsonPromise
+      .then(json => {
+        this.data = json;
+      })
+      .catch(() => {
+        console.log('Algo ha salido mal');
+      });
+
+    return jsonPromise;
   }
+
   getAll() {
     return this.data;
   }
+
   addOne(contact: Contact) {
     this.data.push(contact);
   }
+
   save() {
     // usar la version Async (writeFIle)
-    jsonfile.writeFileSync(__dirname + "/contacts.json", this.data);
+    jsonfile.writeFile(__dirname + '/contacts.json', this.data, { spaces: 2 });
   }
-  getOneById(id) {
-    const encontrado = this.data.find((contacto) => {
-      if (contacto?.id == id) {
-        return true;
-      }
-    });
 
-    return encontrado;
+  getOneById(id: number) {
+    return this.data.find(contact => contact.id === id);
   }
 }
 export { ContactsCollection, Contact };
